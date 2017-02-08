@@ -1,1 +1,1 @@
-# IJCAI17Comp
+# SecretComp
