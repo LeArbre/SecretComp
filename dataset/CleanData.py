@@ -56,7 +56,7 @@ ppd = np.zeros((len(date),len(sid)))
 
 def creatPpd(item):
 	global ppd,datemap
-	ppd[datemap[item.date]][item.sid] = ppd[datemap[item.date]][item.sid] + 1
+	ppd[datemap[item[2]]][item[1]-1] = ppd[datemap[item[2]]][item[1]-1] + 1
 
 # map函数遍历plist
 map(creatPpd,plist)
