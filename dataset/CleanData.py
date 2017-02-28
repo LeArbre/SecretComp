@@ -66,32 +66,14 @@ pay.to_csv('pay_sorted.txt',index=False)
 
 # 对字符串数据切片（取0到-9）,将日期精确到天
 pay.date = pay.date.str.slice(0,-9)
-# 日期精确到天
-date = list(set(pay.date))
-date.sort()
-datemap = {date[i]:i for i in range(len(date))}
+# # 日期精确到天
+# date = list(set(pay.date))
 
-# DataFrame -> numpy
-pay['sid'] = pay['sid'].astype(int)
-pay['uid'] = pay['uid'].astype(int)
-plist = pay.as_matrix()
-
-
-# payment per day
-sid = shop.sid.astype(int).tolist()
-ppd = np.zeros((len(date),len(sid)))
-
-def creatPpd(item):
-	global ppd,datemap
-	ppd[datemap[item[2]]][item[1]-1] = ppd[datemap[item[2]]][item[1]-1] + 1
-
-# map函数遍历plist
-map(creatPpd,plist)
-
-ppd = pd.DataFrame(ppd,index=date,columns=sid)
+# pay per day 以sid和date划分group，然后计算大小
+ppd = pay.groupby(['sid','date']).size()
 ppd.to_csv('pay_per_day.txt')
-# 下次读取时，由于第0列为index
-# 加参数index_col=0
-ppd = pd.read_csv('pay_per_day.txt',index_col=0)
+# 下次读取时，由于第0,1列为index
+# 加参数index_col=[0,1]
+ppd = pd.read_csv('pay_per_day.txt',index_col=[0,1],names=['sid','date','pay'])
 
 # [svc.fit(X_digits[train], y_digits[train]).score(X_digits[test], y_digits[test]) for train, test in kfold] 
