@@ -1,6 +1,7 @@
 #-*-coding:utf-8-*- 
 import pandas as pd 
 import numpy as np
+import pickle
 
 # 如果csv文件无列标题,即第一行为数据
 # 参数加 header = None声明无标题 
@@ -26,11 +27,37 @@ shop.cmt = shop.cmt.fillna(-1)
 shop.c1 = shop.c1.fillna(u'无')
 shop.c2 = shop.c2.fillna(u'无')
 shop.c3 = shop.c3.fillna(u'无')
-# city = shop.city.value_counts().index.tolist()
-# c1 = shop.c1.value_counts().index.tolist()
-# c2 = shop.c2.value_counts().index.tolist()
-# c3 = shop.c3.value_counts().index.tolist()
-shop.to_csv('shop.txt',index = False)
+
+city = shop.city.value_counts().index.tolist()
+citymap = {city[i]:i for i in range(len(city))}
+
+c1 = shop.c1.value_counts().index.tolist()
+c1map = {c1[i]:i for i in range(len(c1))}
+
+c2 = shop.c2.value_counts().index.tolist()
+c2map = {c2[i]:i for i in range(len(c2))}
+
+c3 = shop.c3.value_counts().index.tolist()
+c3map = {c3[i]:i for i in range(len(c3))}
+
+f = open('maps.pkl','w')
+f2 = open('maps.txt','w')
+for i in [citymap,c1map,c2map,c3map]:
+	f2.writelines("map: \n")
+	for j in i:
+		f2.writelines(j+" : "+str(i[j])+'\n')
+	pickle.dump(i,f)
+f.close()
+f2.close()
+
+shop.city = shop.apply(lambda x: citymap[x.city],axis=1)
+shop.c1 = shop.apply(lambda x: c1map[x.c1],axis=1)
+shop.c2 = shop.apply(lambda x: c2map[x.c2],axis=1)
+shop.c3 = shop.apply(lambda x: c3map[x.c3],axis=1)
+shop = shop.drop('sid',axis=1)
+shop = shop.astype(int).as_matrix()
+np.save('shop',shop)
+
 
 # user_pay
 pay = pd.read_csv('user_pay.txt',names=['uid','sid','date'])
